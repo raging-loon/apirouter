@@ -13,7 +13,7 @@ struct url
 
 enum class http_method
 {
-    GET, POST, HEAD
+    UNKNOWN, GET, POST, HEAD
 };
 
 ///

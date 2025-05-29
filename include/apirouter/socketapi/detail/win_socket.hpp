@@ -227,7 +227,8 @@ std::optional<std::string> socket_impl::recv()
         0
     );
 
-    if (res == SOCKET_ERROR)
+    // if res is zero, socket is disconnected
+    if (res == SOCKET_ERROR || res == 0)
         return std::nullopt;
 
     buffer.resize(res + 1);
