@@ -24,7 +24,7 @@ struct parser
         req.method = parse_method(test);
 
         req.path = raw_request.substr(fpos, (spos - fpos));
-
+        req.path = req.path.erase(req.path.find('\r'));
         return req;
     }
 

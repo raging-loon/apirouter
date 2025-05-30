@@ -3,6 +3,8 @@
 
 #include "apirouter/generic/str_util.hpp"
 
+#include "router.hpp"
+
 #include <string>
 #include <vector>
 #include <optional>
@@ -15,22 +17,23 @@ class node
 {
 public:
     node(const std::string& seg)
-        : m_segment(seg), m_children{}
+        : m_segment(seg), m_children{}, m_callback{ nullptr }
     {
     }
 
-    node() : m_segment{}, m_children{} {}
+    node() : m_segment{}, m_children{}, m_callback{ nullptr } {}
 
     const std::string& get_segment() const { return m_segment; }
 
     const auto& get_children() const { return m_children; }
 
+    const auto& get_callback() const { return m_callback; }
 private:
     std::string m_segment;
 
     std::vector<node> m_children;
-
-   
+    
+    route_callback_t m_callback;
 
     friend bool operator==(const node&, const node&);
     friend class tree;
@@ -53,9 +56,9 @@ public:
     {
     }
 
-    inline void insert(const std::vector<std::string>& list);
+    inline void insert(const std::vector<std::string>& list, route_callback_t cb = nullptr);
    
-    inline void insert(node& entry, const generic::string_list& list);
+    inline void insert(node& entry, const generic::string_list& list, route_callback_t cb = nullptr);
 
     inline radix::node* search(const std::vector<std::string>& path);
 
@@ -68,10 +71,10 @@ private:
 };
 
 void radix::tree::insert(
-    const std::vector<std::string>& list
+    const std::vector<std::string>& list, route_callback_t cb
 )
 {
-    return insert(m_root, list);
+    return insert(m_root, list, cb);
 }
 
 radix::node* radix::tree::search(const std::vector<std::string>& path)
@@ -96,7 +99,7 @@ radix::node* radix::tree::search(const std::vector<std::string>& path)
     return head;
 }
 
-void radix::tree::insert(node& entry, const generic::string_list& list)
+void radix::tree::insert(node& entry, const generic::string_list& list, route_callback_t cb)
 {
     radix::node* head = &entry;
 
@@ -118,6 +121,11 @@ void radix::tree::insert(node& entry, const generic::string_list& list)
             head->m_children.push_back({ path });
             head = &head->m_children.back();
         }
+    }
+
+    if (head) 
+    {
+        head->m_callback = cb;
     }
 }
 

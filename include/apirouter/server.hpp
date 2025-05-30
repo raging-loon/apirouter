@@ -3,6 +3,7 @@
 
 #include "routing/radix.hpp"
 #include "routing/router.hpp"
+#include "generic/str_util.hpp"
 #include "socketapi/socketapi.hpp"
 #include <cstdint>
 #include <optional>
@@ -52,6 +53,12 @@ void server::run()
         {
             auto req = http::parser::parse_request(buf.value());
             printf("%d\n", (int)req.method);
+            printf("%s\n", req.path.c_str());
+
+            radix::node* final_path = m_route_tree.search(generic::split_to_str(req.path, '/'));
+            
+            if (final_path && final_path->get_callback())
+                (final_path->get_callback())();
         }
     }
 }
@@ -76,7 +83,7 @@ void server::include_router(const router& r)
     for (const auto& [path, cb] : *r.get_route_table())
     {
         auto list = generic::split_to_str(path, '/');
-        m_route_tree.insert(*entry_node, list);
+        m_route_tree.insert(*entry_node, list, cb);
     }
 
 
