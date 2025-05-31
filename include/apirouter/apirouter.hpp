@@ -5,6 +5,7 @@
 #include "routing/router.hpp"
 #include "http/parser.hpp"
 #include "http/request.hpp"
+#include "http/response.hpp"
 #include "server.hpp"
 
 #endif // APIROUTER_APIROUTER_HPP_

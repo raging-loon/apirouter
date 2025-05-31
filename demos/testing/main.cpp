@@ -1,35 +1,56 @@
 #include <apirouter/apirouter.hpp>
-#include <apirouter/routing/radix.hpp>
 
-#include <apirouter/routing/router.hpp>
-#include <apirouter/generic/str_util.hpp>
+using namespace apirouter;
+
 int main()
 { 
     apirouter::server srv(80);
 
-    apirouter::generic::split_to_str("/wiki/page/edit/",'/');
-    apirouter::router wiki_router{"/wiki"};
+    apirouter::router wiki_router{ "/wiki" };
+    apirouter::router base{"/"};
     
     wiki_router.add_route("/edit/page",
-        []() {
+        [] (const http::request&) -> http::response
+        {
         
-            printf("You got the edit/page page\n");
+            return {"You got the edit/page page\n"};
         }
     );
 
     wiki_router.add_route("/user/insert",
-        []() {
-            printf("You got the user/insert page\n");
+        [] (const http::request&) -> http::response 
+        {
+            return { "You got the user/insert page\n" };
+        }
+    );
+
+    base.add_route("index.html",
+        [](const http::request&) -> http::response
+        {
+            return {
+R"html(
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Welcome to APIRouter++!</title>
+    </head>
+    <body>
+        <div style="width: 75%; margin: auto; text-align: center">
+            <h3>Welcome to APIRouter++!</h3>
+        </div>
+    </body>
+</html>
+
+)html"           
+            };
         }
     );
 
     srv.include_router(wiki_router);
+    srv.include_router(base);
     srv.run();
 
-    auto node = srv.m_route_tree.search({"wiki","user", "insert"});
 
-    if (node && node->get_callback())
-    {
-        (node->get_callback())();
-    }
+
+
 }

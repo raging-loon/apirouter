@@ -6,10 +6,13 @@
 #include <functional>
 #include <unordered_map>
 
+#include "apirouter/http/request.hpp"
+#include "apirouter/http/response.hpp"
+
 namespace apirouter
 {
 
-using route_callback_t = std::function<void()>;
+using route_callback_t = std::function<http::response(const http::request&)>;
 using route_table_t = std::unordered_map < std::string, route_callback_t >;
 
 class router

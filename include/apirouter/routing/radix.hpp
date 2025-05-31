@@ -62,7 +62,7 @@ public:
 
     inline radix::node* search(const std::vector<std::string>& path);
 
-
+    inline radix::node* get_root() { return &m_root; }
 private:
 
 private:

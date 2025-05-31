@@ -58,7 +58,12 @@ void server::run()
             radix::node* final_path = m_route_tree.search(generic::split_to_str(req.path, '/'));
             
             if (final_path && final_path->get_callback())
-                (final_path->get_callback())();
+            {
+                auto response = (final_path->get_callback())(req);
+
+                new_sock->send(response.format_response());
+
+            }
         }
     }
 }
@@ -69,14 +74,18 @@ void server::include_router(const router& r)
         return;
 
     std::string root = r.get_prefix();
+    radix::node* entry_node = nullptr;
+    if (root == "/")
+        entry_node = m_route_tree.get_root();
+    else {
+        if (root.starts_with('/') )
+            root = root.substr(1);
 
-    if (root.starts_with('/'))
-        root = root.substr(1);
+        m_route_tree.insert({ root });
 
-    m_route_tree.insert({ root });
-
-    auto entry_node = m_route_tree.search({ root });
-
+        entry_node = m_route_tree.search({ root });
+    }
+    
     if (!entry_node)
         throw std::runtime_error{"node was inserted but somehow does not exist"};
 

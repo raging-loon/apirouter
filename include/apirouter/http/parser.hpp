@@ -24,7 +24,11 @@ struct parser
         req.method = parse_method(test);
 
         req.path = raw_request.substr(fpos, (spos - fpos));
-        req.path = req.path.erase(req.path.find('\r'));
+        size_t pos = std::string::npos;
+        if ((pos = req.path.find('\r')) != std::string::npos)
+            req.path = req.path.erase(pos);
+        if (req.path.ends_with(' '))
+            req.path.back() = '\0';
         return req;
     }
 

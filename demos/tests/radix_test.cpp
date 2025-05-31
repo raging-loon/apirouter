@@ -21,6 +21,7 @@ TEST(RadixTest, InsertAndSearch)
     test_tree.insert(*node, { "amigas" });
 
     ASSERT_TRUE(node->get_children().size() == 2);
+
     ASSERT_TRUE(
         test_tree.search({
             "hola", "mis", "amigas"

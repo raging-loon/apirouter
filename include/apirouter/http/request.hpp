@@ -2,14 +2,12 @@
 #define API_ROUTER_HTTP_REQUEST_HPP_
 
 #include <string>
+#include <unordered_map>
+
+
 
 namespace apirouter {
 namespace http {
-
-struct url
-{
-    
-};
 
 enum class http_method
 {
@@ -37,6 +35,10 @@ struct request
 
     std::string path;
 
+    std::unordered_map<
+        std::string,
+        std::string
+    > headers;
 
 };
 
