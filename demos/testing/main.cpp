@@ -9,7 +9,7 @@ int main()
     apirouter::router wiki_router{ "/wiki" };
     apirouter::router base{"/"};
     
-    wiki_router.add_route("/edit/page",
+    wiki_router.get("/edit/page",
         [] (const http::request&) -> http::response
         {
         
@@ -17,14 +17,14 @@ int main()
         }
     );
 
-    wiki_router.add_route("/user/insert",
+    wiki_router.get("/user/insert",
         [] (const http::request&) -> http::response 
         {
             return { "You got the user/insert page\n" };
         }
     );
 
-    base.add_route("index.html",
+    base.get("/",
         [](const http::request&) -> http::response
         {
             return {

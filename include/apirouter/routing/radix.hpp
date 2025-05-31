@@ -8,6 +8,7 @@
 #include <string>
 #include <vector>
 #include <optional>
+
 namespace apirouter {
 namespace radix {
 
@@ -34,6 +35,8 @@ private:
     std::vector<node> m_children;
     
     route_callback_t m_callback;
+    
+    http::http_method method;
 
     friend bool operator==(const node&, const node&);
     friend class tree;
@@ -56,9 +59,9 @@ public:
     {
     }
 
-    inline void insert(const std::vector<std::string>& list, route_callback_t cb = nullptr);
+    inline void insert(const std::vector<std::string>& list, route_callback_t cb, http::http_method method);
    
-    inline void insert(node& entry, const generic::string_list& list, route_callback_t cb = nullptr);
+    inline void insert(node& entry, const generic::string_list& list, route_callback_t cb, http::http_method method);
 
     inline radix::node* search(const std::vector<std::string>& path);
 
@@ -71,10 +74,10 @@ private:
 };
 
 void radix::tree::insert(
-    const std::vector<std::string>& list, route_callback_t cb
+    const std::vector<std::string>& list, route_callback_t cb, http::http_method method
 )
 {
-    return insert(m_root, list, cb);
+    return insert(m_root, list, cb, method);
 }
 
 radix::node* radix::tree::search(const std::vector<std::string>& path)
@@ -99,7 +102,7 @@ radix::node* radix::tree::search(const std::vector<std::string>& path)
     return head;
 }
 
-void radix::tree::insert(node& entry, const generic::string_list& list, route_callback_t cb)
+void radix::tree::insert(node& entry, const generic::string_list& list, route_callback_t cb, http::http_method method)
 {
     radix::node* head = &entry;
 
@@ -126,6 +129,7 @@ void radix::tree::insert(node& entry, const generic::string_list& list, route_ca
     if (head) 
     {
         head->m_callback = cb;
+        head->method = method;
     }
 }
 

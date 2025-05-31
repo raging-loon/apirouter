@@ -6,18 +6,12 @@
 #include <cassert>
 #include <unordered_map>
 #include "apirouter/generic/types.hpp"
-
+#include "apirouter/http/status_code.hpp"
 
 namespace apirouter {
 namespace http {
 
 
-enum class status_code_t {
-    OK = 200,
-
-
-    INTERNAL_SERVER_ERROR = 500
-};
 
 ///
 /// @brief
