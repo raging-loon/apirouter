@@ -55,7 +55,7 @@ void server::run()
             printf("%d\n", (int)req.method);
             printf("%s\n", req.path.c_str());
 
-            radix::node* final_path = m_route_tree.search(generic::split_to_str(req.path, '/'));
+            radix::node* final_path = m_route_tree.search(generic::split_str(req.path, '/'));
             if (final_path && final_path->get_callback())
             {
                 auto response = (final_path->get_callback())(req);
@@ -90,7 +90,7 @@ void server::include_router(const router& r)
 
     for (const auto& [path, data] : *r.get_route_table())
     {
-        auto list = generic::split_to_str(path, '/');
+        auto list = generic::split_str(path, '/');
         m_route_tree.insert(*entry_node, list, data.callback, data.method);
     }
 

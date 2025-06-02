@@ -76,7 +76,7 @@ std::string response::format_response() const
 {
     std::stringstream resstr{};
 
-    resstr << "HTTP/1.1 " << (int)m_status_code << " OK\r\n";
+    resstr << "HTTP/1.1 " << (int)m_status_code << " " << g_status_code_map.at(m_status_code) << " \r\n";
     resstr << "content-type: " << m_content_type << "\r\n";
     resstr << "content-length: " << m_content.length() << "\r\n";
     resstr << "\r\n" << m_content;
