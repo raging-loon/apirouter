@@ -3,9 +3,11 @@
 
 #include "request.hpp"
 
+#include "apirouter/generic/str_util.hpp"
+
 #include <string_view>
 #include <string>
-
+#include <iostream>
 namespace apirouter {
 namespace http {
 
@@ -15,20 +17,13 @@ struct parser
     {
         if (raw_request.empty() || raw_request.length() == 1)
             return {};
-        size_t fpos = raw_request.find(' ') + 1;
-        size_t spos = raw_request.find(' ', fpos);
+
+        auto line_view = generic::sv_split_from_str(raw_request, "\r\n");
 
         http::request req{};
-        std::string_view test{ raw_request.begin(), raw_request.begin() + fpos-1 };
-
-        req.method = parse_method(test);
-
-        req.path = raw_request.substr(fpos, (spos - fpos));
-        size_t pos = std::string::npos;
-        if ((pos = req.path.find('\r')) != std::string::npos)
-            req.path = req.path.erase(pos);
-        if (req.path.ends_with(' '))
-            req.path.back() = '\0';
+       
+        parse_request_line(line_view[0], req);
+        parse_headers(line_view, req);
         return req;
     }
 
@@ -41,6 +36,41 @@ struct parser
             return http_method::POST;
 
         return http_method::UNKNOWN;
+    }
+
+    static void parse_request_line(const std::string_view& view, http::request& req)
+    {
+        std::string s{ view };
+        auto split = generic::sv_split(s, ' ');
+        
+        assert(split.size() == 3);
+
+        req.method = parse_method(split[0]);
+
+        req.path = std::string{ split[1] };
+    }
+
+    static void parse_headers(const generic::str_view_list& list, http::request& req)
+    {
+        auto begin = list.begin() + 1;
+
+        auto end = list.end();
+
+        while (begin != end)
+        {
+            size_t split_loc = begin->find(": ");
+            if (split_loc == std::string::npos)
+                break;
+            
+            std::string key{ begin->substr(0, split_loc) };
+            std::string value{ begin->substr(split_loc + 2) };
+
+            //std::cout << key << " => " << value << std::endl;
+
+            req.headers.insert({ key, value });
+
+            begin++;
+        }
     }
 };
 

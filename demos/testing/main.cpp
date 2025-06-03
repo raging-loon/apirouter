@@ -1,33 +1,19 @@
 #include <apirouter/apirouter.hpp>
-
+#include <format>
 using namespace apirouter;
 
 int main()
 { 
     apirouter::server srv(80);
 
-    apirouter::router wiki_router{ "/wiki" };
     apirouter::router base{"/"};
     
-    wiki_router.get("/edit/page",
-        [] (const http::request&) -> http::response
-        {
-        
-            return {"You got the edit/page page\n"};
-        }
-    );
-
-    wiki_router.get("/user/insert",
-        [] (const http::request&) -> http::response 
-        {
-            return { "You got the user/insert page\n" };
-        }
-    );
-
+    unsigned int times = 0;
     base.get("/",
-        [](const http::request&) -> http::response
+        [&times](const http::request&) -> http::response
         {
-            return {
+            times++;
+            return { std::format(
 R"html(
 <!DOCTYPE html>
 <html>
@@ -37,16 +23,16 @@ R"html(
     <body>
         <div style="width: 75%; margin: auto; text-align: center">
             <h3>Welcome to APIRouter++!</h3>
+            <p>This page has been retrieved {} times<p>
         </div>
     </body>
 </html>
 
-)html"           
-            };
+)html"
+            , times) };
         }
     );
 
-    srv.include_router(wiki_router);
     srv.include_router(base);
     srv.run();
 
